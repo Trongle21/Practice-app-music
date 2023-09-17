@@ -4,7 +4,7 @@ import Control from "./Control";
 import Header from "./Header";
 import Input from "./Input";
 import PlayList from "./PlayList";
-import Cd from "./cd";
+import Cd from "./Cd";
 
 const songs = [
   {
@@ -220,20 +220,26 @@ const Player = () => {
 
   const cdThumbRef = useRef();
 
-  useEffect(() => {
-    const cdThumbAnimate = cdThumbRef.current.animate(
-      [{ transform: "rotate(360deg)" }],
-      {
-        duration: 10000,
-        iterations: Infinity,
-      }
-    );
-    cdThumbAnimate.play();
+  const cdThumbAnimateRef = useRef(null);
 
-    return () => {
-      cdThumbAnimate.pause();
-    };
-  }, []);
+  useEffect(() => {
+    if (isPlaying) {
+      const cdThumbAnimate = cdThumbRef.current.animate(
+        [{ transform: "rotate(360deg)" }],
+        {
+          duration: 10000,
+          iterations: Infinity,
+        }
+      );
+      cdThumbAnimateRef.current = cdThumbAnimate;
+      cdThumbAnimate.play();
+    } else {
+      if (cdThumbAnimateRef.current) {
+        cdThumbAnimateRef.current.pause();
+      }
+    }
+  }, [isPlaying]);
+  
 
   const useCd = useRef();
 
