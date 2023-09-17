@@ -220,29 +220,20 @@ const Player = () => {
 
   const cdThumbRef = useRef();
 
-  const cdThumbAnimateRef = useRef(null);
-
   useEffect(() => {
-    if (isPlaying) {
-      const cdThumbAnimate = cdThumbRef.current.animate(
-        [{ transform: "rotate(360deg)" }],
-        {
-          duration: 10000,
-          iterations: Infinity,
-        }
-      );
-      cdThumbAnimateRef.current = cdThumbAnimate;
-      cdThumbAnimate.play();
-
-      return () => {
-        cdThumbAnimate.pause();
-      };
-    } else {
-      if (cdThumbAnimateRef.current) {
-        cdThumbAnimateRef.current.pause();
+    const cdThumbAnimate = cdThumbRef.current.animate(
+      [{ transform: "rotate(360deg)" }],
+      {
+        duration: 10000,
+        iterations: Infinity,
       }
-    }
-  }, [isPlaying]);
+    );
+    cdThumbAnimate.play();
+
+    return () => {
+      cdThumbAnimate.pause();
+    };
+  }, []);
 
   const useCd = useRef();
 
