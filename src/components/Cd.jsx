@@ -1,15 +1,16 @@
 import { usePlayerContext } from "../hooks/usePlayerContext";
 
 const Cd = () => {
-  const { currentSong } = usePlayerContext();
+  const { currentSong, cdThumbRef, useCd } = usePlayerContext();
   return (
-    <div className="cd">
+    <div className="cd" ref={useCd}>
       <div
         className="cd-thumb"
+        ref={cdThumbRef}
         style={{
           backgroundImage: `url(${
             currentSong
-              ? currentSong.artist.avatar
+              ? currentSong.cover
               : "https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg"
           })`,
         }}

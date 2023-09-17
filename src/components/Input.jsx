@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 const Input = ({
   type,
   value,
+  className,
   step,
   min,
   max,
@@ -12,7 +13,7 @@ const Input = ({
   return (
     <input
       id="progress"
-      className="progress"
+      className={className}
       type={type}
       value={value}
       step={step}
@@ -28,6 +29,7 @@ const Input = ({
 Input.propTypes = {
   type: PropTypes.string,
   value: PropTypes.number,
+  className: PropTypes.string,
   step: PropTypes.number,
   min: PropTypes.number,
   max: PropTypes.number || PropTypes.string,

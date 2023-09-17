@@ -62,7 +62,7 @@ const songs = [
         "https://upload.wikimedia.org/wikipedia/en/thumb/d/d6/Pink_Floyd_-_all_members.jpg/250px-Pink_Floyd_-_all_members.jpg",
     },
     cover:
-      "https://amateurphotographer.com/wp-content/uploads/sites/7/2021/10/Required-expansion-for-lead-image.jpg",
+      "https://w7.pngwing.com/pngs/688/569/png-transparent-wish-you-were-here-pink-floyd-song-album-animals-best-of-pink-floyd-a-foot-in-the-door-album-wish-animals-thumbnail.png",
     src: "Pink Floyd - Wish You Were Here.mp3",
   },
   {
@@ -73,7 +73,8 @@ const songs = [
       avatar:
         "https://cdn.britannica.com/18/136518-050-CD0E49C6/The-Beatles-Ringo-Starr-Paul-McCartney-George.jpg",
     },
-    cover: "https://i.ytimg.com/vi/YBcdt6DsLQA/maxresdefault.jpg",
+    cover:
+      "https://www.soundwave-art-prints.com/cdn/shop/products/Beatles-In-My-Life-Wall-Art_530x@2x.jpg?v=1583725592",
     src: "The Beatles - In My Life.mp3",
   },
 ];
@@ -88,6 +89,7 @@ const Player = () => {
   const [currentIndexSong, setCurrentIndexSong] = useState(-1);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [volumeChange, setVolumeChange] = useState(1);
 
   useEffect(() => {
     if (currentIndexSong !== -1) {
@@ -98,7 +100,6 @@ const Player = () => {
 
   useEffect(() => {
     if (isCurrentTimeChange && !audioRef.current.paused) {
-      console.log(isCurrentTimeChange);
       audioRef.current.pause();
     } else if (currentIndexSong !== -1 && isPlaying) {
       audioRef.current.play();
@@ -113,18 +114,39 @@ const Player = () => {
     const handleCurrentTimeChange = () => {
       setCurrentTime(audio.currentTime);
     };
+
     const handleDurationChange = () => {
       setDuration(audio.duration);
     };
 
+    const handleEnd = () => {
+      if (isRepeat) {
+        handleRepeat();
+      } else if (isRandom) {
+        handleRadom();
+      } else {
+        setCurrentIndexSong((prev) =>
+          prev + 1 === songs.length ? 0 : prev + 1
+        );
+      }
+    };
+
+    const handleVolumeChange = () => {
+      setVolumeChange(audio.volume);
+    };
+
     audio.addEventListener("loadedmetadata", handleDurationChange);
     audio.addEventListener("timeupdate", handleCurrentTimeChange);
+    audio.addEventListener("ended", handleEnd);
+    audio.addEventListener("volumechange", handleVolumeChange);
 
     return () => {
       audio.removeEventListener("timeupdate", handleCurrentTimeChange);
       audio.removeEventListener("loadedmetadata", handleDurationChange);
+      audio.removeEventListener("ended", handleEnd);
+      audio.removeEventListener("volumechange", handleVolumeChange);
     };
-  }, [audioRef]);
+  }, [audioRef, isRepeat, isRandom]);
 
   const togglePlay = () => {
     if (currentIndexSong === -1) {
@@ -149,8 +171,8 @@ const Player = () => {
   };
 
   const handleRepeat = () => {
-    if (isRepeat) {
-      audioRef.current.currentTime = 0;
+    audioRef.current.currentTime = 0;
+    if (isPlaying) {
       audioRef.current.play();
     }
   };
@@ -161,7 +183,11 @@ const Player = () => {
     } else if (isRandom) {
       handleRadom();
     } else {
-      setCurrentIndexSong((prev) => (prev - 1 < 0 ? songs.length : prev - 1));
+      if (currentIndexSong >= 0) {
+        setCurrentIndexSong((prev) =>
+          prev - 1 < 0 ? songs.length - 1 : prev - 1
+        );
+      }
     }
   };
 
@@ -186,7 +212,47 @@ const Player = () => {
     audioRef.current.currentTime = newValue;
   };
 
+  const handleVolumeChange = (e) => {
+    audioRef.current.volume = e;
+  };
+
   const currentSong = songs[currentIndexSong];
+
+  const cdThumbRef = useRef();
+
+  const cdThumbAnimateRef = useRef(null);
+
+  useEffect(() => {
+    if (isPlaying) {
+      const cdThumbAnimate = cdThumbRef.current.animate(
+        [{ transform: "rotate(360deg)" }],
+        {
+          duration: 10000,
+          iterations: Infinity,
+        }
+      );
+      cdThumbAnimateRef.current = cdThumbAnimate;
+      cdThumbAnimate.play();
+    } else {
+      if (cdThumbAnimateRef.current) {
+        cdThumbAnimateRef.current.pause();
+      }
+    }
+  }, [isPlaying]);
+
+  const useCd = useRef();
+
+  useEffect(() => {
+    const cdWidth = useCd.current.offsetWidth;
+
+    document.addEventListener("scroll", function () {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const newCdWidth = cdWidth - scrollTop;
+
+      useCd.current.style.width = newCdWidth > 0 ? newCdWidth + "px" : 0;
+      useCd.current.style.opacity = newCdWidth / scrollTop;
+    });
+  }, []);
 
   return (
     <PlayerContext.Provider
@@ -204,29 +270,43 @@ const Player = () => {
         onPrev: handlePrev,
         onNext: handleNext,
         onSelectSong: handleSelectSong,
+        cdThumbRef,
+        useCd,
       }}
     >
       <div className="player">
-        <div className="dashboard">
+        <div
+          className="dashboard"
+          style={{
+            backgroundImage: `url(${
+              currentSong
+                ? currentSong.artist.avatar
+                : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSduiLcLwhwETd13_-8bmRh7skszYvf5lvwrA&usqp=CAU"
+            })`,
+          }}
+        >
+          <div className="background-image"></div>
           <Header />
           <Cd />
           <Control />
           <Input
             type="range"
+            className="progress"
             value={currentTime}
-            min={1}
+            min={0}
             step={1}
             max={duration}
             onChange={(e) => handleTimeChange(e.target.value)}
-            onMouseDown={() => {
-              setIsCurrentTimeChange(true);
-            }}
-            onMouseUp={() => {
-              setIsCurrentTimeChange(false);
-            }}
-            f
           />
-          {/* <audio id="audio" src=""></audio> */}
+          <Input
+            type="range"
+            className="volume"
+            value={volumeChange}
+            min={0}
+            step={0.1}
+            max={1}
+            onChange={(e) => handleVolumeChange(e.target.value)}
+          />
         </div>
 
         <PlayList />

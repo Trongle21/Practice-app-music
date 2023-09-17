@@ -17,15 +17,7 @@ html {
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
 }
-/* 
-.container {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  filter: blur(10px);
-} */
+
 
 .player {
   position: relative;
@@ -47,6 +39,7 @@ html {
 }
 
 .dashboard {
+  position: relative;
   padding: 16px 16px 14px;
   background-color: #fff;
   position: fixed;
@@ -56,7 +49,19 @@ html {
   border-bottom: 1px solid #ebebeb;
 }
 
-/* HEADER */
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: inherit;
+  filter: blur(10px);
+  z-index: -99;
+  background-size: cover;
+  background-position: center;
+  background-repeat: repeat;
+}
 
 header {
   text-align: center;
@@ -69,7 +74,7 @@ header h4 {
 }
 
 header h2 {
-  color: var(--text-color);
+  color: #fff;
   font-size: 20px;
 }
 
@@ -100,7 +105,7 @@ header h2 {
 }
 
 .control .btn {
-  color: #666;
+  color: #fff;
   padding: 18px;
   font-size: 18px;
   cursor: pointer;
@@ -134,8 +139,27 @@ header h2 {
   -webkit-transition: 0.2s;
   transition: opacity 0.2s;
 }
-
 .progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 6px;
+  background-color: var(--primary-color);
+  cursor: pointer;
+}
+
+.volume {
+  width: 30%;
+  -webkit-appearance: none;
+  height: 6px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: 0.2s;
+  transition: opacity 0.2s;
+}
+
+.volume::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 12px;
@@ -159,6 +183,10 @@ header h2 {
   padding: 8px 16px;
   border-radius: 5px;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+.song:first-child {
+  margin-top: 16px;
 }
 
 .song.active {
