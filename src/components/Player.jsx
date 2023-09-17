@@ -233,6 +233,10 @@ const Player = () => {
       );
       cdThumbAnimateRef.current = cdThumbAnimate;
       cdThumbAnimate.play();
+
+      return () => {
+        cdThumbAnimate.pause();
+      };
     } else {
       if (cdThumbAnimateRef.current) {
         cdThumbAnimateRef.current.pause();
@@ -297,6 +301,8 @@ const Player = () => {
             step={1}
             max={duration}
             onChange={(e) => handleTimeChange(e.target.value)}
+            onMouseDown={() => setIsCurrentTimeChange(true)}
+            onMouseUp={() => setIsCurrentTimeChange(false)}
           />
           <Input
             type="range"
